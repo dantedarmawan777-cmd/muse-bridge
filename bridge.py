@@ -569,7 +569,9 @@ def cmd_serve():
     threading.Thread(target=_sweeper, daemon=True).start()
 
     def listen_addrs():
-        addrs = ["127.0.0.1"]
+        # Coolify/Docker: bind all interfaces so the reverse proxy can reach the bridge
+        # (0.0.0.0 covers loopback too; binding both fails on Linux with EADDRINUSE)
+        addrs = ["0.0.0.0"]
         try:
             out = subprocess.run(["tailscale", "ip", "-4"], capture_output=True,
                                  text=True, timeout=10).stdout
